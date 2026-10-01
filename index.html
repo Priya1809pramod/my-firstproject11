@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Textile Company Analytics Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f6f8;color:#17202a}
+.header{background:#17202a;color:white;padding:28px 5%;}
+.header h1{margin:0 0 8px;font-size:30px}
+.header p{margin:0;opacity:.85}
+.container{max-width:1250px;margin:24px auto;padding:0 18px}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:20px}
+.card{background:white;border-radius:14px;padding:18px;box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.kpi-title{font-size:12px;color:#6b7280;text-transform:uppercase}
+.kpi-value{font-size:22px;font-weight:700;margin-top:7px}
+.grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.chart-card{background:white;border-radius:14px;padding:20px;box-shadow:0 4px 16px rgba(0,0,0,.06);min-height:330px}
+.chart-card h2{font-size:18px;margin:0 0 15px}
+.insights{background:white;border-radius:14px;padding:20px;box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.insights li{margin:10px 0;line-height:1.45}
+.note{font-size:12px;color:#6b7280;margin-top:20px}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.grid,.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>Textile Company — Data Analytics Dashboard</h1>
+<p>Sales • Profitability • Production • Quality • Customer Experience | Synthetic portfolio dataset</p>
+</div>
+<div class="container">
+<div class="kpis">
+<div class="card"><div class="kpi-title">Revenue</div><div class="kpi-value">₹14.93 Cr</div></div>
+<div class="card"><div class="kpi-title">Profit</div><div class="kpi-value">₹5.19 Cr</div></div>
+<div class="card"><div class="kpi-title">Units Sold</div><div class="kpi-value">0.58M</div></div>
+<div class="card"><div class="kpi-title">Avg Margin</div><div class="kpi-value">34.7%</div></div>
+<div class="card"><div class="kpi-title">Defect Rate</div><div class="kpi-value">2.8%</div></div>
+<div class="card"><div class="kpi-title">Satisfaction</div><div class="kpi-value">4.0/5</div></div>
+</div>
+
+<div class="grid">
+<div class="chart-card"><h2>Monthly Revenue & Profit</h2><canvas id="monthlyChart"></canvas></div>
+<div class="chart-card"><h2>Revenue by Region</h2><canvas id="regionChart"></canvas></div>
+</div>
+
+<div class="grid2">
+<div class="chart-card"><h2>Revenue by Product</h2><canvas id="productChart"></canvas></div>
+<div class="chart-card"><h2>Factory Defect & Waste</h2><canvas id="factoryChart"></canvas></div>
+</div>
+
+<div class="insights">
+<h2>Management Insights</h2>
+<ul id="insightList"></ul>
+<div class="note">Dataset is synthetic and intended for learning/portfolio demonstration. Values are not actual company results.</div>
+</div>
+</div>
+
+<script>
+const monthly = [{"Month": "2025-01", "Revenue_INR": 11385813.11, "Profit_INR": 3882511.57, "Units_Sold": 44822}, {"Month": "2025-02", "Revenue_INR": 13995162.209999999, "Profit_INR": 4937658.9, "Units_Sold": 53128}, {"Month": "2025-03", "Revenue_INR": 11151023.459999999, "Profit_INR": 3956970.88, "Units_Sold": 43946}, {"Month": "2025-04", "Revenue_INR": 13774381.33, "Profit_INR": 4853490.34, "Units_Sold": 56677}, {"Month": "2025-05", "Revenue_INR": 14787171.41, "Profit_INR": 5138984.22, "Units_Sold": 57089}, {"Month": "2025-06", "Revenue_INR": 9941353.52, "Profit_INR": 3472425.71, "Units_Sold": 40744}, {"Month": "2025-07", "Revenue_INR": 11543775.69, "Profit_INR": 3940744.3000000003, "Units_Sold": 44197}, {"Month": "2025-08", "Revenue_INR": 12663768.77, "Profit_INR": 4467642.26, "Units_Sold": 47123}, {"Month": "2025-09", "Revenue_INR": 8418000.21, "Profit_INR": 2885841.15, "Units_Sold": 36532}, {"Month": "2025-10", "Revenue_INR": 15491099.59, "Profit_INR": 5410612.8, "Units_Sold": 57511}, {"Month": "2025-11", "Revenue_INR": 12200699.76, "Profit_INR": 4183622.0, "Units_Sold": 40940}, {"Month": "2025-12", "Revenue_INR": 13977810.31, "Profit_INR": 4760276.47, "Units_Sold": 55087}];
+const product = [{"Product": "Linen", "Revenue_INR": 44668971.92, "Profit_INR": 15760860.9, "Units_Sold": 122236, "Avg_Defect_Rate_Pct": 2.7358333333333333}, {"Product": "Denim", "Revenue_INR": 33117476.59, "Profit_INR": 11415877.57, "Units_Sold": 107208, "Avg_Defect_Rate_Pct": 2.617156862745098}, {"Product": "Cotton Fabric", "Revenue_INR": 26246531.28, "Profit_INR": 9119286.24, "Units_Sold": 122964, "Avg_Defect_Rate_Pct": 2.88296}, {"Product": "Viscose", "Revenue_INR": 24301369.91, "Profit_INR": 8305349.97, "Units_Sold": 104692, "Avg_Defect_Rate_Pct": 2.8615315315315315}, {"Product": "Polyester Fabric", "Revenue_INR": 20995709.67, "Profit_INR": 7289405.92, "Units_Sold": 120696, "Avg_Defect_Rate_Pct": 2.8281538461538465}];
+const region = [{"Region": "South", "Revenue_INR": 33903849.45, "Profit_INR": 11932924.45, "Units_Sold": 130751}, {"Region": "West", "Revenue_INR": 32273229.26, "Profit_INR": 11081195.77, "Units_Sold": 123653}, {"Region": "East", "Revenue_INR": 28350820.4, "Profit_INR": 9721166.36, "Units_Sold": 107641}, {"Region": "Central", "Revenue_INR": 28002198.73, "Profit_INR": 9817370.4, "Units_Sold": 112041}, {"Region": "North", "Revenue_INR": 26799961.53, "Profit_INR": 9338123.62, "Units_Sold": 103710}];
+const factory = [{"Factory": "Unit A", "Production_Units": 236460, "Avg_Defect_Rate_Pct": 2.731875, "Avg_Waste_Pct": 4.772447916666667, "Avg_Lead_Time_Days": 6.697916666666667}, {"Factory": "Unit B", "Production_Units": 216850, "Avg_Defect_Rate_Pct": 2.7477319587628863, "Avg_Waste_Pct": 4.738453608247423, "Avg_Lead_Time_Days": 6.88659793814433}, {"Factory": "Unit C", "Production_Units": 226029, "Avg_Defect_Rate_Pct": 2.879252336448598, "Avg_Waste_Pct": 4.702196261682243, "Avg_Lead_Time_Days": 6.901869158878505}];
+
+new Chart(document.getElementById('monthlyChart'), {
+ type:'line',
+ data:{
+   labels:monthly.map(x=>x.Month),
+   datasets:[
+    {label:'Revenue (₹)',data:monthly.map(x=>x.Revenue_INR),tension:.25},
+    {label:'Profit (₹)',data:monthly.map(x=>x.Profit_INR),tension:.25}
+   ]
+ },
+ options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true}}}
+});
+
+new Chart(document.getElementById('regionChart'), {
+ type:'bar',
+ data:{labels:region.map(x=>x.Region),datasets:[{label:'Revenue (₹)',data:region.map(x=>x.Revenue_INR)}]},
+ options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+});
+
+new Chart(document.getElementById('productChart'), {
+ type:'bar',
+ data:{labels:product.map(x=>x.Product),datasets:[{label:'Revenue (₹)',data:product.map(x=>x.Revenue_INR)}]},
+ options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+});
+
+new Chart(document.getElementById('factoryChart'), {
+ type:'bar',
+ data:{labels:factory.map(x=>x.Factory),datasets:[
+   {label:'Defect %',data:factory.map(x=>x.Avg_Defect_Rate_Pct)},
+   {label:'Waste %',data:factory.map(x=>x.Avg_Waste_Pct)}
+ ]},
+ options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}}}
+});
+
+const topProduct = product[0];
+const topRegion = region[0];
+const highestDefect = [...factory].sort((a,b)=>b.Avg_Defect_Rate_Pct-a.Avg_Defect_Rate_Pct)[0];
+const lowestDefect = [...factory].sort((a,b)=>a.Avg_Defect_Rate_Pct-b.Avg_Defect_Rate_Pct)[0];
+
+document.getElementById('insightList').innerHTML = `
+<li><b>${topProduct.Product}</b> is the highest-revenue product in this synthetic dataset.</li>
+<li><b>${topRegion.Region}</b> is the highest-revenue region.</li>
+<li><b>${highestDefect.Factory}</b> has the highest average defect rate and should be investigated for quality improvement.</li>
+<li><b>${lowestDefect.Factory}</b> has the lowest average defect rate among the three factories.</li>
+<li>Management can use the dashboard to monitor revenue, profitability and factory quality together rather than looking at sales alone.</li>
+`;
+</script>
+</body>
+</html>
